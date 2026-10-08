@@ -1,0 +1,31 @@
+// PERURI-SENTINEL: timing output_release_gate (ilustrasi, siklus CLK_sys).
+// Sumber: parameter spesifikasi teknis (TDL 1-2 siklus target, AES 11-15 siklus estimasi, H = 4 estimasi).
+// Dummy cycle DPA (0-3 per operasi) tidak digambar.
+{
+  signal: [
+    { name: "clk_sys", wave: "p.................." },
+    { name: "start",   wave: "010................" },
+    {},
+    ["A: operasi bersih",
+      { name: "state",          wave: "=.=..........=...==", data: ["IDLE", "OP: ronde R0-R10 (11 siklus)", "HOLD (H = 4)", "REL", "IDLE"] },
+      { name: "tdl_alert_any",  wave: "0.................." },
+      { name: "gate_block",     wave: "0.................." },
+      { name: "ct_valid",       wave: "0................10" },
+      { name: "ciphertext_out", wave: "=................==", data: ["0", "CT", "0"] }
+    ],
+    {},
+    ["B: glitch pada ronde terakhir (S-03)",
+      { name: "state",          wave: "=.=..........=.=..=", data: ["IDLE", "OP: ronde R0-R10 (11 siklus)", "HOLD", "SUPPRESS", "IDLE"] },
+      { name: "glitch",         wave: "0...........10....." },
+      { name: "tdl_alert_any",  wave: "0.............10...", node: "............C.B...." },
+      { name: "gate_block",     wave: "0.............1...0" },
+      { name: "ct_valid",       wave: "0.................." },
+      { name: "ciphertext_out", wave: "=..................", data: ["0 (ciphertext rusak tetap ditahan)"] },
+      { name: "tamper_counter", wave: "=...............=..", data: ["n", "n + 1"] }
+    ]
+  ],
+  edge: ["C<->B ≤ 2 siklus"],
+  head: { tick: 0, every: 1 },
+  foot: { text: "Ilustrasi; latensi TDL = target. REL = RELEASE. tamper_counter naik setelah sync_2ff." },
+  config: { hscale: 1 }
+}
